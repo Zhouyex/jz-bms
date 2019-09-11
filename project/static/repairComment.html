@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src='./qiniu.min.js'></script>
+    <style>
+        form {
+            border: 2px solid #000000;
+            width: 800px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="http://localhost:3000/login" method='post'>
+        <h1>管理员登录</h1>
+        <select name="type" >
+            <option value="0">超管</option>
+            <option value="1">普管</option>
+        </select>
+        <input type="text" name="name" value="admin">
+        <input type="text" name="pass" value="123">
+        <button type="submit">点击</button>
+    </form>
+    <form>
+        <h1>添加评论</h1>
+        <div><input type="text" placeholder="userId" class="userId"></div>
+        <div><input type="text" placeholder="repairId" class="repairId"></div>
+        <div><input type="text" placeholder="content" class="content"></div>
+        <button type="button" class="add">添加评论</button>
+    </form>
+    <form>
+        <h1>维修评论查询</h1>
+        <button type="button" class="find">查询</button>
+    </form>
+    <form>
+        <h1>维修评论查询</h1>
+        <input type="text" class="repairId2">
+        <button type="button" class="find2">查询</button>
+    </form>
+    <form>
+        <h1>维修删除</h1>
+        <input type="text" class="delId">
+        <button type="button" class="del">删除</button>
+    </form>
+
+    
+</body>
+<script>
+    $(function () {
+        $(".add").click(()=>{
+            $.ajax({
+                url:"/addRepairComment",
+                data:{
+                    userId:$(".userId").val(),
+                    repairId:$(".repairId").val(),
+                    content:$(".content").val(),
+                    time:new Date().getTime()
+                },
+                success(d){
+                    console.log(d)
+                }
+            })
+        })
+        $(".find").click(function(){
+            $.ajax({
+                url:'/findRepairComment',
+                success(d){
+                    console.log(d)
+                }
+            })
+        })
+        $(".find2").click(function(){
+            $.ajax({
+                url:'/findRepairComment',
+                data:{
+                    repairId:$(".repairId2").val()
+                },
+                success(d){
+                    console.log(d)
+                }
+            })
+        })
+        $(".del").click(function(){
+            $.ajax({
+                url:"/delRepairComment",
+                data:{
+                    id:$(".delId").val()
+                },
+                success(d){
+                    console.log(d)
+                }
+            })
+        })
+    })
+</script>
+
+</html>

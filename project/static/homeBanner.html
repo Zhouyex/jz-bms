@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src='./qiniu.min.js'></script>
+    <style>
+        form {
+            border: 2px solid #000000;
+            width: 800px;
+            margin: 20px auto;
+        }
+        .img img{
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="http://localhost:3000/login" method='post'>
+        <h1>管理员登录</h1>
+        <select name="type">
+            <option value="0">超管</option>
+            <option value="1">普管</option>
+            <option value="2">用户</option>
+        </select>
+        <input type="text" name="name" value="admin">
+        <input type="text" name="pass" value="123">
+        <button type="submit">点击</button>
+    </form>
+    
+    <form>
+        <input type="file" class="file">
+        <button class="uploadImg" type="button">提交</button>
+    </form>
+    <form>
+        <button class="getBanner" type="button">点击获取轮播图</button>
+        <div class="img"></div>
+    </form>
+    <form>
+        <input type="text" class="delId" placeholder="删除的id">
+        <button class="delBanner" type="button">删除</button>
+    </form>
+    <script>
+        $(function () {
+            
+            //七牛云上传文件
+            var baseUrl = 'http://pu3hbi0r3.bkt.clouddn.com/'
+            var file = null;
+            var name = '';
+            $('.file').change(function () {
+                file = this.files[0]
+                name = new Date().getTime() + file.name.slice(file.name.lastIndexOf('.'));
+
+            })
+            $(".uploadImg").click(function () {
+                $.ajax({
+                    url: '/getToken',
+                    success(d) {
+                        console.log('------get token---------')
+                        console.log(d)
+                        token = d.token;
+                        qiniu.upload(file, name, token).subscribe(function (res) {
+                            console.log(res)
+                            if (res.total.percent == 100) {
+                                console.log('-------100--------')
+                                var img = baseUrl + name;
+                                $.ajax({
+                                    url: '/addHomeBanner',
+                                    method: 'get',
+                                    data: {
+                                        img: img,
+                                    },
+                                    success(d) {
+                                        console.log("********************")
+                                        console.log(d)
+                                    },
+                                    error(err){
+                                        console.log(err)
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+            })
+
+            //获取轮播图
+            $(".getBanner").click(function(){
+                $.ajax({
+                    url:"/homeBanner",
+                    success(d){
+                        var data=d.data;
+                        for(var i=0;i<data.length;i++){
+                            var img=$("img")
+                            $(".img").append('<img src="'+data[i].img+'" />')
+                        }
+                    }
+                })
+            })
+            //删除轮播图
+            $(".delBanner").click(function(){
+                $.ajax({
+                    url:"/delHomeBanner",
+                    data:{
+                        id:$('.delId').val()
+                    },
+                    success(d){
+                        console.log(d)
+                    }
+                })
+            })
+        })
+    </script>
+</body>
+
+</html>

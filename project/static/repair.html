@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src='./qiniu.min.js'></script>
+    <style>
+        form {
+            border: 2px solid #000000;
+            width: 800px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="http://localhost:3000/login" method='post'>
+        <h1>管理员登录</h1>
+        <select name="type" >
+            <option value="0">超管</option>
+            <option value="1">普管</option>
+        </select>
+        <input type="text" name="name" value="admin">
+        <input type="text" name="pass" value="123">
+        <button type="submit">点击</button>
+    </form>
+    <form action="/addRepair" method='get'>
+        <h1>添加维修</h1>
+        <div><input type="text" placeholder="name" name='name'></div>
+        <div><input type="text" placeholder="score" name='score'></div>
+        <div><input type="text" placeholder="type" name='type'></div>
+        <div><input type="text" placeholder="address" name='address'></div>
+        <div><input type="text" placeholder="tel" name='tel'></div>
+        <div><input type="text" placeholder="len" name='len'></div>
+        <div><input type="text" placeholder="likeNum" name='likeNum'></div>
+        <div><input type="text" placeholder="readNum" name='readNum'></div>
+        <div><input type="text" placeholder="info" name='info'></div>
+        <button type="submit" class="add">添加维修</button>
+    </form>
+    <form action="/findRepair">
+        <button type="submit">查询</button>
+    </form>
+    <form action="/findRepair">
+        <input type="text" placeholder="id" name="id">
+        <button type="submit">查询</button>
+    </form>
+    <form action="/delRepair">
+        <input type="text" placeholder="id" name="id">
+        <button type="submit">删除</button>
+    </form>
+    <form action="/updateRepair" method='get'>
+        <h1>更新维修</h1>
+        <input type="text" placeholder="id" name="id">
+        <div><input type="text" placeholder="name" name='name'></div>
+        <div><input type="text" placeholder="score" name='score'></div>
+        <div><input type="text" placeholder="type" name='type'></div>
+        <div><input type="text" placeholder="address" name='address'></div>
+        <div><input type="text" placeholder="tel" name='tel'></div>
+        <div><input type="text" placeholder="len" name='len'></div>
+        <div><input type="text" placeholder="likeNum" name='likeNum'></div>
+        <div><input type="text" placeholder="readNum" name='readNum'></div>
+        <div><input type="text" placeholder="info" name='info'></div>
+        <button type="submit" class="add">更新维修</button>
+    </form>
+</body>
+<script>
+    
+</script>
+
+</html>

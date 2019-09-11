@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src='./qiniu.min.js'></script>
+    <style>
+        form {
+            border: 2px solid #000000;
+            width: 800px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="http://localhost:3000/login" method='post'>
+        <h1>管理员登录</h1>
+        <select name="type" >
+            <option value="0">超管</option>
+            <option value="1">普管</option>
+        </select>
+        <input type="text" name="name" value="admin">
+        <input type="text" name="pass" value="123">
+        <button type="submit">点击</button>
+    </form>
+    <form>
+        <h1>添加水站</h1>
+        <input type="file" class="img">
+        <div><input type="text" placeholder="water name" class="name"></div>
+        <div><input type="text" placeholder="water score" class="score"></div>
+        <div><input type="text" placeholder="water count" class="count"></div>
+        <div><input type="text" placeholder="water like num" class="likeNum"></div>
+        <div><input type="text" placeholder="water read num" class="readNum"></div>
+        <div><input type="text" placeholder="water address" class="address"></div>
+        <div><input type="text" placeholder="water len" class="len"></div>
+        <div><input type="text" placeholder="water des" class="des"></div>
+        <div><input type="text" placeholder="tel" class="tel"></div>
+        <div><input type="text" placeholder="price" class="price"></div>
+        <button type="button" class="add">添加水站</button>
+    </form>
+    <form>
+        <h1>水站查询</h1>
+        <button type="button" class="find">查询</button>
+    </form>
+    <form>
+        <h1>水站删除</h1>
+        <input type="text" class="delId">
+        <button type="button" class="del">删除</button>
+    </form>
+
+    <form>
+        <h1>更新水站</h1>
+        <input type="text" class="updateId">
+        <input type="file" class="img2">
+        <div><input type="text" placeholder="water name" class="name2"></div>
+        <div><input type="text" placeholder="water score" class="score2"></div>
+        <div><input type="text" placeholder="water count" class="count2"></div>
+        <div><input type="text" placeholder="water like num" class="likeNum2"></div>
+        <div><input type="text" placeholder="water read num" class="readNum2"></div>
+        <div><input type="text" placeholder="water address" class="address2"></div>
+        <div><input type="text" placeholder="water len" class="len2"></div>
+        <div><input type="text" placeholder="water des" class="des2"></div>
+        <div><input type="text" placeholder="tel" class="tel2"></div>
+        <div><input type="text" placeholder="price" class="price2"></div>
+        <button type="button" class="update">更新水站</button>
+    </form>
+</body>
+<script>
+    $(function () {
+        var name="";
+        var baseUrl = 'http://pu3hbi0r3.bkt.clouddn.com/'
+        var file=null;
+        $(".img").change(function(){
+            file=this.files[0];
+            name = new Date().getTime() + file.name.slice(file.name.lastIndexOf('.'));
+        })
+        $(".img2").change(function(){
+            file=this.files[0];
+            name = new Date().getTime() + file.name.slice(file.name.lastIndexOf('.'));
+        })
+        $(".add").click(function(){
+            $.ajax({
+                url:"/getToken",
+                success(d){
+                    var token=d.token;
+                    qiniu.upload(file,name,token).subscribe(res=>{
+                        if(res.total.percent==100){
+                            var img = baseUrl + name;
+                            $.ajax({
+                                url:"/addWater",
+                                data:{
+                                    img:img,
+                                    name:$(".name").val(),
+                                    score:$(".score").val(),
+                                    count:$(".count").val(),
+                                    likeNum:$(".likeNum").val(),
+                                    readNum:$(".readNum").val(),
+                                    address:$(".address").val(),
+                                    len:$(".len").val(),
+                                    des:$(".des").val(),
+                                    tel:$(".tel").val(),
+                                    price:$(".price").val(),
+                                },
+                                success(d){
+                                    console.log(d)
+                                }
+                            })
+                        }
+                    })
+                }
+            })
+        })
+        $(".find").click(function(){
+            $.ajax({
+                url:"/findWater",
+                success(d){
+                    console.log(d)
+                }
+            })
+        })
+        $(".del").click(function(){
+            $.ajax({
+                url:"/delWater",
+                data:{
+                    id:$('.delId').val()
+                },
+                success(d){
+                    console.log(d)
+                }
+            })
+        })
+        $(".update").click(function(){
+            $.ajax({
+                url:"/getToken",
+                success(d){
+                    var token=d.token;
+                    qiniu.upload(file,name,token).subscribe(res=>{
+                        if(res.total.percent==100){
+                            var img=baseUrl+name;
+                            $.ajax({
+                                url:"/updateWater",
+                                data:{
+                                    id:$(".updateId").val(),
+                                    img:img,
+                                    name:$(".name2").val(),
+                                    score:$(".score2").val(),
+                                    count:$(".count2").val(),
+                                    likeNum:$(".likeNum2").val(),
+                                    readNum:$(".readNum2").val(),
+                                    address:$(".address2").val(),
+                                    len:$(".len2").val(),
+                                    des:$(".des2").val(),
+                                    tel:$(".tel2").val(),
+                                    price:$(".price2").val(),
+                                },
+                                success(d){
+                                    console.log(d)
+                                }
+                            })
+                        }
+                    })
+                }
+            })
+        })
+    })
+</script>
+
+</html>

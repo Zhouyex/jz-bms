@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src='./qiniu.min.js'></script>
+    <style>
+        form {
+            border: 2px solid #000000;
+            width: 800px;
+            margin: 20px auto;
+        }
+
+        .img img {
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="http://localhost:3000/login" method='post'>
+        <h1>管理员登录</h1>
+        <select name="type">
+            <option value="0">超管</option>
+            <option value="1">普管</option>
+        </select>
+        <input type="text" name="name" value="admin">
+        <input type="text" name="pass" value="123">
+        <button type="submit">点击</button>
+    </form>
+
+    <form>
+        <h3>添加</h3>
+        <div><input type="file" placeholder="img" class="addImg"></div>
+        <div><input type="text" placeholder="num" class="addnum"></div>
+        <div><input type="file" placeholder="teacherImg" class="addteacherimg"></div>
+        <button type='button' class="add">添加</button>
+    </form>
+    <form>
+        <h3>获取</h3>
+        <button class="getTop" type="button">点击获取轮播图</button>
+
+    </form>
+    <form>
+        <h3>删除</h3>
+        <input type="text" class="delId" placeholder="删除的id">
+        <button class="delTop" type="button">删除</button>
+    </form>
+    <button>
+        <h3>更新</h3>
+        <input type="text" class="updateId" placeholder="更新的id">
+        <div><input type="file" placeholder="img" class="addImg2"></div>
+        <div><input type="text" placeholder="num" class="addnum2"></div>
+        <div><input type="file" placeholder="teacherImg" class="addteacherimg2"></div>
+        <button type='button' class="update">添加</button>
+    </button>
+    <script>
+        $(function () {
+
+            //七牛云上传文件
+            var baseUrl = 'http://pu3hbi0r3.bkt.clouddn.com/'
+            var file1 = null;
+            var name1 = '';
+            var file2 = null;
+            var name2 = '';
+            $('.addImg').change(function () {
+                file1 = this.files[0]
+                name1 = new Date().getTime() + file1.name.slice(file1.name.lastIndexOf('.'));
+
+            })
+            $(".addteacherimg").change(function () {
+                file2 = this.files[0];
+                name2 = new Date().getTime() + file2.name.slice(file2.name.lastIndexOf('.'));
+            })
+            $(".add").click(function () {
+                $.ajax({
+                    url: '/getToken',
+                    success(d) {
+                        token = d.token;
+                        qiniu.upload(file1, name1, token).subscribe(function (res) {
+
+                            if (res.total.percent == 100) {
+                                console.log('-------100--------')
+                                var img1 = baseUrl + name1;
+                                qiniu.upload(file2, name2, token).subscribe(res => {
+                                    var img2 = baseUrl + name2;
+                                    if (res.total.percent == 100) {
+                                        console.log(img1)
+                                        console.log(img2)
+                                        console.log($(".addnum").val())
+
+                                        $.ajax({
+                                            url: "/addTeacherTop",
+                                            data: {
+                                                img: img1,
+                                                teacherImg: img2,
+                                                num: $(".addnum").val()
+                                            },
+                                            success(d) {
+                                                console.log(d)
+                                            }
+                                        })
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+            })
+
+            //获取轮播图
+            $(".getTop").click(function () {
+                $.ajax({
+                    url: "/teacherTop",
+                    success(d) {
+                        console.log(d)
+                    }
+                })
+            })
+            //删除轮播图
+            $(".delTop").click(function () {
+                $.ajax({
+                    url: "/delTeacherTop",
+                    data: {
+                        id: $('.delId').val()
+                    },
+                    success(d) {
+                        console.log(d)
+                    }
+                })
+            })
+            //更新
+            $(".addImg2").change(function () {
+                file1 = this.files[0]
+                name1 = new Date().getTime() + file1.name.slice(file1.name.lastIndexOf('.'));
+            })
+            $(".addteacherimg2").change(function () {
+                file2 = this.files[0]
+                name2 = new Date().getTime() + file2.name.slice(file2.name.lastIndexOf('.'));
+            })
+
+            $(".update").click(function () {
+                $.ajax({
+                    url: "/getToken",
+                    success(d) {
+                        var token = d.token;
+
+                        qiniu.upload(file1, name1, token).subscribe(function (res) {
+                            if (res.total.percent == 100) {
+                                var img1 = baseUrl + name1;
+                                qiniu.upload(file2, name2, token).subscribe(res => {
+                                    if (res.total.percent == 100) {
+                                        var img2 = baseUrl + name2;
+                                        $.ajax({
+                                            url: "/updateTeacherTop",
+                                            data: {
+                                                img: img1,
+                                                num: $('.addnum2').val(),
+                                                id: $(".updateId").val(),
+                                                teacherImg:img2
+                                            },
+                                            success(d) {
+                                                console.log(d)
+                                            }
+                                        })
+                                    }
+                                })
+
+                            }
+                        })
+                    }
+                })
+            })
+        })
+    </script>
+</body>
+
+</html>

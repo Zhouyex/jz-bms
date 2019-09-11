@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+    <script src='./qiniu.min.js'></script>
+    <style>
+        form {
+            border: 2px solid #000000;
+            width: 800px;
+            margin: 20px auto;
+        }
+
+        .img img {
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+            <form action="http://localhost:3000/login" method='post'>
+                <h1>管理员登录</h1>
+                <select name="type" >
+                    <option value="0">超管</option>
+                    <option value="1">普管</option>
+                </select>
+                <input type="text" name="name" value="admin">
+                <input type="text" name="pass" value="123">
+                <button type="submit">点击</button>
+            </form>
+            <form>
+                <h1>添加员工</h1>
+                <div><input type="file" class="img"  @change='change($event)'></div>
+                <div><input type="text" placeholder="name" v-model='user.name'></div>
+                <div><input type="text" placeholder="year" v-model='user.year'></div>
+                <div><input type="text" placeholder="vNum" v-model='user.vNum'></div>
+                <div><input type="text" placeholder="price" v-model='user.price'></div>
+                <div><input type="text" placeholder="city" v-model='user.city'></div>
+                <div><input type="text" placeholder="age" v-model='user.age'></div>
+                <div><input type="text" placeholder="edu" v-model='user.edu'></div>
+                <div><input type="text" placeholder="experience" v-model='user.experience'></div>
+
+                <div><input type="text" placeholder="readNum" v-model='user.readNum'></div>
+                <div><input type="text" placeholder="likeNum" v-model='user.likeNum'></div>
+                <div><input type="text" placeholder="len" v-model='user.len'></div>
+                <div><input type="text" placeholder="tel" v-model='user.tel'></div>
+                <div><input type="text" placeholder="info" v-model='user.info'></div>
+                <div>资格证书：
+                    <input type="checkbox" value="身份证" v-model='user.qualification'>身份证
+                    <input type="checkbox" value="学位证" v-model='user.qualification'>学位证
+                    <input type="checkbox" value="健康证" v-model='user.qualification'>健康证
+                </div>
+                <div>服务类型：
+                    <input type="checkbox" value="月嫂" v-model='user.type'>月嫂
+                    <input type="checkbox" value="钟点工" v-model='user.type'>钟点工
+                    <input type="checkbox" value="保姆" v-model='user.type'>保姆
+                    <input type="checkbox" value="保洁" v-model='user.type'>保洁
+                </div>
+                <button type="button" @click='add()'>添加</button>
+            </form>
+            <form>
+                <button type="button" @click='find()'>查询</button>
+            </form>
+            <form>
+                <input type="text" v-model='findId'>
+                <button type="button" @click='find2()'>查询</button>
+            </form>
+            <form>
+                <input type="text" v-model='findtype'>
+                <button type="button" @click='find3()'>查询</button>
+            </form>
+            <form>
+                <h1>删除</h1>
+                <input type="text" v-model='delId'>
+                <button type="button" @click='del()'>查询</button>
+            </form>
+
+            <form>
+                    <h1>修改员工</h1>
+                    <input type="text" v-model='up.id'>
+                    <div><input type="file" class="img"  @change='change($event)'></div>
+                    <div><input type="text" placeholder="name" v-model='up.name'></div>
+                    <div><input type="text" placeholder="year" v-model='up.year'></div>
+                    <div><input type="text" placeholder="vNum" v-model='up.vNum'></div>
+                    <div><input type="text" placeholder="price" v-model='up.price'></div>
+                    <div><input type="text" placeholder="city" v-model='up.city'></div>
+                    <div><input type="text" placeholder="age" v-model='up.age'></div>
+                    <div><input type="text" placeholder="edu" v-model='up.edu'></div>
+                    <div><input type="text" placeholder="experience" v-model='up.experience'></div>
+    
+                    <div><input type="text" placeholder="readNum" v-model='up.readNum'></div>
+                    <div><input type="text" placeholder="likeNum" v-model='up.likeNum'></div>
+                    <div><input type="text" placeholder="len" v-model='up.len'></div>
+                    <div><input type="text" placeholder="tel" v-model='up.tel'></div>
+                    <div><input type="text" placeholder="info" v-model='up.info'></div>
+                    <div>资格证书：
+                        <input type="checkbox" value="身份证" v-model='up.qualification'>身份证
+                        <input type="checkbox" value="学位证" v-model='up.qualification'>学位证
+                        <input type="checkbox" value="健康证" v-model='up.qualification'>健康证
+                    </div>
+                    <div>服务类型：
+                        <input type="checkbox" value="月嫂" v-model='up.type'>月嫂
+                        <input type="checkbox" value="钟点工" v-model='up.type'>钟点工
+                        <input type="checkbox" value="保姆" v-model='up.type'>保姆
+                        <input type="checkbox" value="保洁" v-model='up.type'>保洁
+                    </div>
+                    <button type="button" @click='update()'>更新</button>
+                </form>
+
+    </div>
+    <script>
+         var baseUrl = 'http://pu3hbi0r3.bkt.clouddn.com/'
+        new Vue({
+            el:"#app",
+            data:{
+                delId:"",
+                findtype:"",
+                findId:"",
+                file:null,
+                name:"",
+                user:{
+                    img:"",
+                    name:"",
+                    year:"",
+                    vNum:"",
+                    price:"",
+                    city:"",
+                    age:"",
+                    edu:"",
+                    experience:"",
+                    readNum:"",
+                    likeNum:"",
+                    len:"",
+                    tel:"",
+                    info:"",
+                    qualification:[],
+                    type:[]
+                },
+                up:{
+                    id:"",
+                    img:"",
+                    name:"",
+                    year:"",
+                    vNum:"",
+                    price:"",
+                    city:"",
+                    age:"",
+                    edu:"",
+                    experience:"",
+                    readNum:"",
+                    likeNum:"",
+                    len:"",
+                    tel:"",
+                    info:"",
+                    qualification:[],
+                    type:[]
+                }
+            },
+            methods:{
+                del(){
+                    $.ajax({
+                        url:"/delHomeWorker",
+                        data:{
+                            id:this.delId
+                        },
+                        success(d){
+                            console.log(d)
+                        }
+                    })
+                },
+                update(){
+                    var _this=this;
+                    $.ajax({
+                        url:"/getToken",
+                        success(d){
+                            var token=d.token;
+                            qiniu.upload(_this.file,_this.name,token).subscribe(res=>{
+                                if(res.total.percent==100){
+                                    _this.up.img=baseUrl+_this.name;
+                                    $.ajax({
+                                        url:"/updateHomeWorker",
+                                        data:_this.up,
+                                        success(d){
+                                            console.log(d)
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    })
+                },
+                change(e){
+                    console.log(e)
+                    // console.log()
+                    this.file=e.target.files[0];
+                    this.name=new Date().getTime() + this.file.name.slice(this.file.name.lastIndexOf('.'));
+                },
+                find(){
+                    $.ajax({
+                        url:"/findHomeWorker",
+                        success(d){
+                            console.log(d)
+                        }
+                    })
+                },
+                find2(){
+                    var that=this;
+                    $.ajax({
+                        url:"/findHomeWorker",
+                        data:{
+                            id:that.findId
+                        },
+                        success(d){
+                            console.log(d)
+                        }
+                    })
+                },
+                find3(){
+                    var that=this;
+                    $.ajax({
+                        url:"/findHomeWorker",
+                        data:{
+                            type:that.findtype
+                        },
+                        success(d){
+                            console.log(d)
+                        }
+                    })
+                },
+                add(){
+                    console.log(this.user)
+                    var _this=this;
+                    $.ajax({
+                        url:"/getToken",
+                        success(d){
+                            var token=d.token;
+                            qiniu.upload(_this.file,_this.name,token).subscribe(res=>{
+                                if(res.total.percent==100){
+                                    _this.user.img=baseUrl+_this.name;
+                                    $.ajax({
+                                        url:"/addHomeWorker",
+                                        data:_this.user,
+                                        success(d){
+                                            console.log(d)
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    })
+                }
+            }
+        })
+    </script>
+</body>
+</html>

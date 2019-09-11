@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <style>
+        form {
+            border: 2px solid #000000;
+            width: 800px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="http://localhost:3000/login" method='post'>
+        <h1>管理员登录</h1>
+        <select name="type" >
+            <option value="0">超管</option>
+            <option value="1">普管</option>
+        </select>
+        <input type="text" name="name" value="admin">
+        <input type="text" name="pass" value="123">
+        <button type="submit">点击</button>
+    </form>
+
+    <form action="http://localhost:3000/addManage" method='post'>
+        <h1>添加管理员</h1>
+        <div>
+            <input type="text" placeholder="name" name="name">
+        </div>
+        <div>
+            <input type="text" placeholder="pass" name="pass">
+        </div>
+        <div>
+            <input type="date" placeholder="time" name="time">
+        </div>
+        <div>
+            <input type="text" placeholder="des" name="des">
+        </div>
+        <button type="submit">点击</button>
+    </form>
+
+    <form action="http://localhost:3000/findManage" method='post'>
+        <h1>查询管理员</h1>
+
+        <button type="button" class="findManage">点击</button>
+    </form>
+
+    <form action="" method='post'>
+        <h1>删除管理员</h1>
+        <input type="text" class="delId" placeholder="删除的manageid">
+        <button type="button" class="delManage">删除管理员</button>
+    </form>
+    <form  method='post'>
+        <h1>更新管理员</h1>
+        <input type="text" class='upid' placeholder="更新管理员的id">
+        <div>
+            <input type="text" placeholder="name" class="upname">
+        </div>
+        <div>
+            <input type="text" placeholder="pass" class="uppass">
+        </div>
+        <div>
+            <input type="date" placeholder="time" class="uptime">
+        </div>
+        <div>
+            <input type="text" placeholder="des" class="updes">
+        </div>
+        <button type="button" class="update">点击</button>
+    </form>
+
+    <form >
+        <input type="text" placeholder="修改的账号" class="cname">
+        <input type="text" placeholder="原始密码" class="oldpass">
+        <input type="text" placeholder="新密码" class="newpass">
+        <button type="button" class="changepass">修改</button>
+    </form>
+
+    
+</body>
+<script>
+    $(function () {
+        $('.findManage').click(function () {
+            $.ajax({
+                url: "/findManage",
+                method: 'post',
+                data: {},
+                success(d) {
+                    console.log(d);
+
+                }
+            })
+        })
+        $('.delManage').click(function () {
+            $.ajax({
+                url: "/delManage",
+                method: 'post',
+                data: {
+                    id: $('.delId').val()
+                },
+                success(d) {
+                    console.log(d);
+
+                }
+            })
+        })
+        $('.update').click(function(){
+            $.ajax({
+                url:'/updateManage',
+                method:'post',
+                data:{
+                    id:$('.upid').val(),
+                    name:$('.upname').val(),
+                    pass:$('.uppass').val(),
+                    des:$('.updes').val(),
+                    time:new Date($('.uptime').val()).getTime(),
+                },
+                success(d){
+                    console.log(d)
+                }
+            })
+        })
+        $('.changepass').click(function(){
+            $.ajax({
+                url:'/changePassManage',
+                method:'post',
+                data:{
+                    name:$(".cname").val(),
+                    oldpass:$('.oldpass').val(),
+                    newpass:$('.newpass').val()
+                },
+                success(d){
+                    console.log(d)
+                }
+            })
+        })
+
+        //上传图片到七牛云
+        const accessKey = 'cZch8pgcf-Rt8_bKTV_cIc4iEBXTi5QzshniFCOp';
+        const secretKey = '_46y1oHS_xsS8ucGE_WHXqcUnvo1oPb1NuaWUiZh';
+        const bucket = 'lingyiqing';
+        
+    })
+</script>
+
+</html>
